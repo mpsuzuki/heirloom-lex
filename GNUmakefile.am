@@ -1,0 +1,47 @@
+YACC = @YACC@
+# -DFORMPATH='"/usr/ccs/lib/lex"'
+YFLAGS = @YFLAGS@
+CFLAGS = @AC_CFLAGS@ -D_GNU_SOURCE -DFORMPATH='"@FORMPATH@"'
+bin_PROGRAMS = lex
+lib_LIBRARIES = libl.a
+EXTRA_DIST = lex.1 nrform nceucform ncform ldefs.c Makefile.mk
+man1_MANS = lex.1
+FORMPATH = @FORMPATH@
+
+BUILT_SOURCES = parser.c
+MOSTLYCLEANFILES = parser.c
+
+lex_SOURCES = \
+	once.h  search.h  sgs.h \
+	main.c sub1.c sub2.c sub3.c header.c wcio.c \
+	getopt.c lsearch.c
+
+# Automake wants to include the output of YACC in the source tarball.
+# To prevent it, nodist_XXX_SOURCES is used for YACC output and
+# explicit rule to invoke YACC is written.
+EXTRA_DIST += parser.y
+nodist_lex_SOURCES = parser.c
+parser.c: parser.y
+	$(YACC) $(YFLAGS) $^
+	mv y.tab.c $@
+
+libl_a_SOURCES = \
+	allprint.c libmain.c reject.c yyless.c yywrap.c reject.c
+
+libl_a_LIBADD = \
+	$(W_OBJS) $(E_OBJS)
+
+W_OBJS = allprint_w.o reject_w.o yyless_w.o
+E_OBJS = reject_e.o yyless_e.o
+
+%_w.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS) -DEUC -DJLSLEX -DWOPTION
+
+%_e.o: %.c
+	$(CC) -c -o $@ $< $(CFLAGS) -DEUC -DJLSLEX -DEOPTION
+
+install-data-local:
+	$(MKDIR_P) $(DESTDIR)/$(FORMPATH)/
+	$(INSTALL_DATA) nrform    $(DESTDIR)/$(FORMPATH)/
+	$(INSTALL_DATA) nceucform $(DESTDIR)/$(FORMPATH)/
+	$(INSTALL_DATA) ncform    $(DESTDIR)/$(FORMPATH)/
