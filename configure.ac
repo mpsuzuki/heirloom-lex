@@ -1,5 +1,5 @@
 AC_PREREQ([2.62])
-AC_INIT([lex-heirloom], [0.0.20240915], [https://gitlab.com/mpsuzuki/lex-heirloom/-/issues])
+AC_INIT([heirloom-lex], [0.0.20240915], [https://github.com/mpsuzuki/heirloom-lex/-/issues])
 AM_INIT_AUTOMAKE([foreign])
 
 # Set default prefix
